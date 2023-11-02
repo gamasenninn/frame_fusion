@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3つのiFrameを使用</title>
+    <style>
+        .iframe-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .iframe-container iframe {
+            /* flex: 1; */
+            border: none;
+            /* width: 33.33%; こちらを削除 */
+            height: 98vh;
+            border: 0.1px solid #333;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-container">
+        <!-- iframe タグは JavaScript で動的に生成します -->
+    </div>
+
+    <!-- 設定ファイルとメインの JavaScript ファイルを読み込みます -->
+    <script src="config.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const iframeContainer = document.querySelector('.iframe-container');
+
+            CONFIG.IFRAME_URLS.forEach(url => {
+                const iframe = document.createElement('iframe');
+                iframe.src = url[0];  // こちらを修正
+                iframeContainer.appendChild(iframe);
+            });
+            setIframeWidths();
+        });
+    
+        // こちらのコードに追加
+        function setIframeWidths() {
+            CONFIG.IFRAME_URLS.forEach(([url, widthPercent]) => {
+                const iframe = document.querySelector(`iframe[src="${url}"]`);
+                if (iframe) {
+                    // パーセントが0の場合、幅を指定しない（任意の値）
+                    if (widthPercent !== 0) {
+                        iframe.style.width = `${widthPercent}%`;
+                    }
+                }
+            });
+        }
+        // DOMが読み込まれた後に実行
+        //document.addEventListener('DOMContentLoaded', setIframeWidths);
+    </script>
+</body>
+</html>
