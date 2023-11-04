@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3つのiFrameを使用</title>
+    <style>
+        .iframe-container {
+            display: flex;
+            height: 100vh;
+            position: relative;  /* 追加 */
+        }
+
+        .iframe-container iframe {
+            border: none;
+            height: 98vh;
+            border: 0.1px solid #333;
+            border-radius: 5px;
+            box-sizing: border-box;  /* 追加 */
+        }
+
+        .resizer {  /* 追加 */
+            cursor: ew-resize;
+            background-color: #aaa;
+            width: 10px;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #overlay {  /* 追加 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-container">
+        <!-- iframe タグは JavaScript で動的に生成します -->
+        <div class="resizer" onmousedown="startResize(event, 0)"></div>  /* 追加 */
+        <div class="resizer" onmousedown="startResize(event, 1)"></div>  /* 追加 */
+        <div id="overlay"></div>  /* 追加 */
+    </div>
+
+    <!-- 設定ファイルとメインの JavaScript ファイルを読み込みます -->
+    <script src="config.js"></script>
+    <script>
+        var overlay = document.getElementById('overlay');
+        var iframes = [];
+        var resizers = document.querySelectorAll('.resizer');
+
+        function startResize(e, index) {
+            e.preventDefault();
+            overlay.style.pointerEvents = 'all';
+            document.addEventListener('mousemove', function(event) { resize(event, index); });
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        function resize(e, index) {
+            var totalWidth = iframes[index].offsetWidth + iframes[index + 1].offsetWidth;
+            var newWidth = e.clientX - iframes[index].offsetLeft;
+            iframes[index].style.width = newWidth + 'px';
+            iframes[index + 1].style.width = (totalWidth - newWidth - resizers[index].offsetWidth) + 'px';
+        }
+
+        function stopResize() {
+            overlay.style.pointerEvents = 'none';
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const iframeContainer = document.querySelector('.iframe-container');
+
+            CONFIG.IFRAME_URLS.forEach(url => {
+                const iframe = document.createElement('iframe');
+                iframe.src = url[0];
+                iframeContainer.appendChild(iframe);
+                iframes.push(iframe);  // iframes配列に追加
+            });
+            setIframeWidths();
+        });
+
+        function setIframeWidths() {
+            CONFIG.IFRAME_URLS.forEach(([url, widthPercent]) => {
+                const iframe = document.querySelector(`iframe[src="${url}"]`);
+                if (iframe && widthPercent !== 0) {
+                    iframe.style.width = `${widthPercent}%`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

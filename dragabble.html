@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resizable Frames</title>
+<style>
+  body, html { height: 100%; margin: 0; }
+  #container { display: flex; height: 100%; }
+  #frame1, #frame2 { flex-grow: 1; border: none; }
+  #resizer { cursor: ew-resize; background-color: #aaa; width: 10px; }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <div id="frame1" style="background: lightblue;">Frame 1</div>
+  <div id="resizer" onmousedown="startResize(event)"></div>
+  <div id="frame2" style="background: lightgreen;">Frame 2</div>
+</div>
+
+<script>
+  var resizer = document.getElementById('resizer');
+  var leftFrame = document.getElementById('frame1');
+  var rightFrame = document.getElementById('frame2');
+  var container = document.getElementById('container');
+
+  function startResize(e) {
+    e.preventDefault();
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+  }
+
+  function resize(e) {
+    var containerWidth = container.offsetWidth;
+    var newLeftFrameWidth = e.clientX;
+    leftFrame.style.width = newLeftFrameWidth + 'px';
+    rightFrame.style.width = (containerWidth - newLeftFrameWidth - resizer.offsetWidth) + 'px';
+  }
+
+  function stopResize() {
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+  }
+
+  resizer.addEventListener('mousedown', startResize);
+</script>
+
+</body>
+</html>
