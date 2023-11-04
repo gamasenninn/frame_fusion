@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resizable Frames</title>
+<style>
+  body, html { height: 100%; margin: 0; }
+  #container { display: flex; height: 100%; position: relative; }
+  #frame1, #frame2 { flex-grow: 1; border: none; box-sizing: border-box; }
+  #resizer { cursor: ew-resize; background-color: #aaa; width: 10px; }
+  #overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <iframe id="frame1" src="sample.com" style="border:0;"></iframe>
+  <div id="resizer" onmousedown="startResize(event)"></div>
+  <iframe id="frame2" src="sample2.com" style="border:0;"></iframe>
+  <div id="overlay"></div> <!-- overlay divを追加 -->
+</div>
+
+<script>
+  var resizer = document.getElementById('resizer');
+  var leftFrame = document.getElementById('frame1');
+  var rightFrame = document.getElementById('frame2');
+  var container = document.getElementById('container');
+  var overlay = document.getElementById('overlay');  // overlay divを取得
+
+  function startResize(e) {
+    e.preventDefault();
+    overlay.style.pointerEvents = 'all';  // overlay divを有効化
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+  }
+
+  function resize(e) {
+    var containerWidth = container.offsetWidth;
+    var newLeftFrameWidth = e.clientX - leftFrame.offsetLeft;
+    leftFrame.style.width = newLeftFrameWidth + 'px';
+    rightFrame.style.width = (containerWidth - newLeftFrameWidth - resizer.offsetWidth) + 'px';
+  }
+
+  function stopResize() {
+    overlay.style.pointerEvents = 'none';  // overlay divを無効化
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+  }
+
+  resizer.addEventListener('mousedown', startResize);
+</script>
+
+</body>
+</html>
