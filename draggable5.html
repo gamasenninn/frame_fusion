@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resizable Frames</title>
+<script src="config.js"></script>
+<style>
+  body, html { height: 100%; margin: 0; }
+  #container { display: flex; height: 100%; position: relative; }
+  .frame { flex-grow: 1; border: none; box-sizing: border-box; }
+  .resizer { cursor: ew-resize; background-color: #aaa; width: 10px; height: 100%; }
+  #overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <div id="overlay"></div>
+</div>
+
+<script>
+  window.onload = function() {
+    var container = document.getElementById('container');
+    var overlay = document.getElementById('overlay');
+    var urls = CONFIG.IFRAME_URLS;
+
+    for (let i = 0; i < urls.length; i++) {
+      var frame = document.createElement('iframe');
+      frame.className = 'frame';
+      frame.src = urls[i][0];
+      frame.style.flexGrow = urls[i][1];  // Changed width to flexGrow
+      container.insertBefore(frame, overlay);
+
+      if (i < urls.length - 1) {
+        var resizer = document.createElement('div');
+        resizer.className = 'resizer';
+        resizer.onmousedown = startResize.bind(null, frame);
+        container.insertBefore(resizer, overlay);
+      }
+    }
+
+    function startResize(frame, e) {
+        const resizer = e.target;
+        const resizerLeft = resizer.offsetLeft;
+        const initialX = e.clientX - resizerLeft;
+        const initialWidth = frame.offsetWidth;
+
+        const resize = (e) => {
+          const deltaX = e.clientX - resizerLeft - initialX;
+          frame.style.width = initialWidth + deltaX + 'px';
+        };
+
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResizeBound);
+      }
+
+      function resize(frame, initialX, initialWidth, e) {
+          // リサイザー要素のoffsetLeftを計算
+        const resizerLeft = e.target.offsetLeft; 
+        
+        // マウス移動量をリサイザー左端からの差分として計算
+        const deltaX = e.clientX - resizerLeft - initialX;
+        //var deltaX = e.clientX - initialX;  // Calculate the change in X position of the mouse
+        var newWidth = initialWidth + deltaX;
+        if (newWidth > 0) {  // Ensure the new width is positive
+          frame.style.width = newWidth + 'px';
+        }
+      }
+
+      function stopResize(resizeBound, e) {
+        overlay.style.pointerEvents = 'none';
+        document.removeEventListener('mousemove', resizeBound);
+        document.removeEventListener('mouseup', stopResize);
+      }
+
+  };
+</script>
+
+
+</body>
+</html>

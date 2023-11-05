@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Resizable Frames</title>
+<script src="config.js"></script> <!-- config.jsをインクルード -->
 <style>
   body, html { height: 100%; margin: 0; }
   #container { display: flex; height: 100%; position: relative; }
@@ -15,13 +16,22 @@
 <body>
 
 <div id="container">
-  <iframe id="frame1" src="https://www.bing.com/search?q=Bing+AI&showconv=1&FORM=hpcodx" style="border:0;"></iframe>
+  <iframe id="frame1" style="border:0;"></iframe> <!-- src属性を削除 -->
   <div id="resizer" onmousedown="startResize(event)"></div>
-  <iframe id="frame2" src="https://www.bing.com/news/search" style="border:0;"></iframe>
+  <iframe id="frame2" style="border:0;"></iframe> <!-- src属性を削除 -->
   <div id="overlay"></div> <!-- overlay divを追加 -->
 </div>
 
 <script>
+  window.onload = function() {  // window.onloadイベントハンドラを設定
+    var urls = CONFIG.IFRAME_URLS;
+    document.getElementById('frame1').src = urls[0][0];
+    document.getElementById('frame1').style.width = urls[0][1] + '%';
+    document.getElementById('frame2').src = urls[1][0];
+    document.getElementById('frame2').style.width = urls[1][1] + '%';
+  };
+
+  // その他のコードは変更なし
   var resizer = document.getElementById('resizer');
   var leftFrame = document.getElementById('frame1');
   var rightFrame = document.getElementById('frame2');
